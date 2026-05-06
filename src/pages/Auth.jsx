@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 export default function Auth({ onLogin }) {
   const [isLogin, setIsLogin] = useState(true);
 
-  // ✅ OTP states
+  // ✅ OTP states - Fully Preserved
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpVerified, setOtpVerified] = useState(false);
 
-  // ✅ HANDLE SUBMIT
+  // ✅ HANDLE SUBMIT - FULL LOGIC RESTORED
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -31,38 +31,43 @@ export default function Auth({ onLogin }) {
       ? "http://127.0.0.1:8000/api/auth/login/"
       : "http://127.0.0.1:8000/api/auth/register/";
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(
-        isLogin
-          ? { email: payload.email, password: payload.password }
-          : payload
-      ),
-    });
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          isLogin
+            ? { email: payload.email, password: payload.password }
+            : payload
+        ),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      localStorage.setItem("access", data.tokens.access);
-      localStorage.setItem("refresh", data.tokens.refresh);
+      if (response.ok) {
+        localStorage.setItem("access", data.tokens.access);
+        localStorage.setItem("refresh", data.tokens.refresh);
 
-      alert("Login Successful!");
-      onLogin();
-    } else {
-      const errorMsg =
-        data.non_field_errors?.[0] ||
-        data.password?.[0] ||
-        data.error ||
-        "Something went wrong";
+        alert("Login Successful!");
+        onLogin();
+      } else {
+        const errorMsg =
+          data.non_field_errors?.[0] ||
+          data.password?.[0] ||
+          data.error ||
+          "Something went wrong";
 
-      alert(errorMsg);
+        alert(errorMsg);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error during authentication");
     }
   };
 
-  // ✅ SEND OTP (FIXED)
+  // ✅ SEND OTP - FULL LOGIC RESTORED
   const sendOtp = async () => {
     if (!email) {
       alert("Enter email first");
@@ -92,7 +97,7 @@ export default function Auth({ onLogin }) {
     }
   };
 
-  // ✅ VERIFY OTP (FIXED)
+  // ✅ VERIFY OTP - FULL LOGIC RESTORED
   const verifyOtp = async () => {
     if (!otp) {
       alert("Enter OTP");
@@ -107,7 +112,7 @@ export default function Auth({ onLogin }) {
         },
         body: JSON.stringify({
           email: email,
-          otp: otp.trim(),   // ✅ IMPORTANT FIX
+          otp: otp.trim(), // ✅ YOUR IMPORTANT FIX KEPT
         }),
       });
 
@@ -121,19 +126,22 @@ export default function Auth({ onLogin }) {
       }
     } catch (err) {
       console.error(err);
-      alert("Server error during OTP verification");
+      alert("Server error during verification");
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50/50">
-      <div className="bento-card w-full max-w-md animate-fade-in">
+  // UI Styling Variable
+  const inputStyle = "w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all";
 
-        <h2 className="text-4xl font-black mb-2 text-slate-900">
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6 bg-transparent">
+      <div className="bento-card w-full max-w-md animate-fade-in backdrop-blur-2xl bg-black/20 border border-white/10">
+
+        <h2 className="text-4xl font-black mb-2 text-white drop-shadow-md">
           {isLogin ? 'Welcome Back' : 'Join Us'}
         </h2>
 
-        <p className="text-slate-500 mb-8 font-medium">
+        <p className="text-white/60 mb-8 font-medium">
           {isLogin ? 'Login to manage your trips' : 'Create an account to start planning'}
         </p>
 
@@ -144,7 +152,7 @@ export default function Auth({ onLogin }) {
               name="name"
               type="text"
               placeholder="Full Name"
-              className="input-field"
+              className={inputStyle}
               required
             />
           )}
@@ -154,7 +162,7 @@ export default function Auth({ onLogin }) {
             name="email"
             type="email"
             placeholder="Email Address"
-            className="input-field"
+            className={inputStyle}
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -162,21 +170,21 @@ export default function Auth({ onLogin }) {
 
           {/* OTP SECTION */}
           {!isLogin && (
-            <>
+            <div className="space-y-3">
               {!otpSent ? (
                 <button
                   type="button"
                   onClick={sendOtp}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl font-bold"
+                  className="w-full bg-purple-500/80 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-purple-500/20"
                 >
                   Send OTP
                 </button>
               ) : (
-                <>
+                <div className="space-y-3 animate-fade-in">
                   <input
                     type="text"
                     placeholder="Enter OTP"
-                    className="input-field"
+                    className={inputStyle}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                   />
@@ -184,26 +192,26 @@ export default function Auth({ onLogin }) {
                   <button
                     type="button"
                     onClick={verifyOtp}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-bold"
+                    className="w-full bg-emerald-500/80 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/20"
                   >
                     Verify OTP
                   </button>
 
                   {otpVerified && (
-                    <p className="text-green-500 text-sm font-bold text-center">
+                    <p className="text-emerald-400 text-sm font-bold text-center drop-shadow-sm">
                       ✅ OTP Verified
                     </p>
                   )}
-                </>
+                </div>
               )}
-            </>
+            </div>
           )}
 
           <input
             name="password"
             type="password"
             placeholder="Password"
-            className="input-field"
+            className={inputStyle}
             required
           />
 
@@ -212,20 +220,20 @@ export default function Auth({ onLogin }) {
               name="confirmPassword"
               type="password"
               placeholder="Confirm Password"
-              className="input-field"
+              className={inputStyle}
               required
             />
           )}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black shadow-xl"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-4 rounded-2xl font-black shadow-2xl shadow-blue-500/30 transition-all mt-4 active:scale-95"
           >
             {isLogin ? 'LOGIN' : 'CREATE ACCOUNT'}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t text-center">
+        <div className="mt-8 pt-6 border-t border-white/10 text-center">
           <button
             onClick={() => {
               setIsLogin(!isLogin);
@@ -233,7 +241,7 @@ export default function Auth({ onLogin }) {
               setOtpVerified(false);
               setOtp("");
             }}
-            className="text-sm font-bold text-blue-600 hover:underline"
+            className="text-sm font-bold text-blue-400 hover:text-blue-300 transition-colors"
           >
             {isLogin
               ? "Don't have an account? Register here"

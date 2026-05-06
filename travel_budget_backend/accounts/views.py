@@ -38,23 +38,6 @@ def register_user(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Login API
-@api_view(['POST'])
-def login_user(request):
-    email = request.data.get("email")
-    password = request.data.get("password")
-
-    user = authenticate(username=email, password=password)
-
-    if user:
-        tokens = get_tokens(user)
-        return Response({
-            "message": "Login successful",
-            "tokens": tokens
-        })
-
-    return Response({"error": "Invalid credentials"}, status=400)
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_profile(request):
@@ -94,26 +77,36 @@ def change_password(request):
 
 @api_view(['POST'])
 def login_user(request):
+
+    print("REQUEST:", request.data)
+
     email = request.data.get("email")
     password = request.data.get("password")
 
-    # Validate email format
-    try:
-        validate_email(email)
-    except ValidationError:
-        return Response({"error": "Invalid email format"}, status=400)
+    if not email or not password:
+        return Response(
+            {"error": "Email and password required"},
+            status=400
+        )
 
-    from django.contrib.auth.models import User
-    user = User.objects.filter(email=email).first()
+    user = authenticate(
+        username=email,
+        password=password
+    )
 
-    if user and user.check_password(password):
+    print("AUTH USER:", user)
+
+    if user is not None:
         tokens = get_tokens(user)
+
         return Response({
             "message": "Login successful",
             "tokens": tokens
         })
 
-    return Response({"error": "Invalid credentials"}, status=400)
+    return Response({
+        "error": "Invalid email or password"
+    }, status=400)
 
 otp_store = {}
 

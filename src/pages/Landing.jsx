@@ -6,8 +6,8 @@ export default function Landing({ onStart }) {
       <h1 className="text-8xl font-black tracking-tighter text-slate-900 mb-6">
         Travel<span className="text-blue-600">Wise</span>
       </h1>
-      <p className="text-slate-500 font-bold uppercase tracking-widest mb-10">
-        Plan • Spend • Visualize
+      <p className="text-black-500 font-bold uppercase tracking-widest mb-10">
+        Plan • Track • Visualize
       </p>
       
       <button 
@@ -18,12 +18,20 @@ export default function Landing({ onStart }) {
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mt-24">
-        {['Key Features', 'Why Us?', 'Our Team'].map((title) => (
-          <div key={title} className="bento-card text-left">
-            <h3 className="font-black text-xl mb-2">{title}</h3>
-            <p className="text-slate-500 text-sm">Organize your travel budget with ease and elegance.</p>
-          </div>
-        ))}
+        <div className="bento-card text-left">
+          <h3 className="font-black text-xl mb-2">Trip Management</h3>
+          <p className="text-slate-500 text-sm">Create and manage multiple trips with custom budgets and dates.</p>
+        </div>
+        
+        <div className="bento-card text-left">
+          <h3 className="font-black text-xl mb-2">Expense Tracking</h3>
+          <p className="text-slate-500 text-sm">Add expenses by category and track spending in real-time.</p>
+        </div>
+        
+        <div className="bento-card text-left">
+          <h3 className="font-black text-xl mb-2">Budget Visualization</h3>
+          <p className="text-slate-500 text-sm">Clear visual insights showing spent vs remaining budget at a glance.</p>
+        </div>
       </div>
     </div>
   );
